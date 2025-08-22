@@ -1,5 +1,7 @@
+import json
 import os
 import subprocess
+import time
 from datetime import datetime, timedelta
 
 import requests
@@ -10,6 +12,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+
+load_dotenv()
 
 
 def get_twitch_access_token():
@@ -102,6 +106,7 @@ def get_file_path(game_name, clip_index, isOriginal):
 
 def crop_video(input_file_path, output_file_path):
     os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
+    print(f"Cropping video: {input_file_path} to {output_file_path}")
 
     try:
         subprocess.run(
@@ -120,9 +125,89 @@ def crop_video(input_file_path, output_file_path):
         print(f"Failed converting the video {input_file_path}")
 
 
-# Twitch API credentials
+ACCESS_TOKEN = os.getenv("INSTAGRAM_ACCESS_TOKEN")
+BASE_URL = "https://graph.facebook.com/v23.0"
+IG_USER_ID = os.getenv("INSTAGRAM_USER_ID")
+ROOT_URL = f"{BASE_URL}/{IG_USER_ID}"
 
-load_dotenv()
+
+def upload_file(filepath):
+    if not os.path.isfile(filepath):
+        raise FileNotFoundError(f"Fichier introuvable: {filepath}")
+
+    filename = os.path.basename(filepath)
+    path = f"/test/Valorant/{filename}"
+
+    upload_url = "https://content.dropboxapi.com/2/files/upload"
+
+    # Your API token
+    token = os.getenv("DROPBOX_ACCESS_TOKEN")
+
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/octet-stream",
+        "Dropbox-API-Arg": json.dumps(
+            {
+                "autorename": False,
+                "mode": "add",
+                "mute": False,
+                "path": path,
+                "strict_conflict": False,
+            }
+        ),
+    }
+
+    with open(filepath, "rb") as f:
+        upload_response = requests.post(upload_url, headers=headers, data=f)
+
+    if upload_response.status_code != 200:
+        print(upload_response.status_code)
+        print(upload_response.text)
+        return None
+
+    get_link_url = "https://api.dropboxapi.com/2/files/get_temporary_link"
+
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+
+    data = {"path": path}
+
+    response = requests.post(get_link_url, headers=headers, data=json.dumps(data))
+
+    return response.json().get("link", "")
+
+
+def create_container(video_url):
+    url = f"{ROOT_URL}/media"
+    payload = {
+        "video_url": video_url,
+        "media_type": "REELS",
+        "access_token": ACCESS_TOKEN,
+    }
+    response = requests.post(url, data=payload)
+    response.raise_for_status()
+    container_id = response.json().get("id")
+    print(f"Container créé : {container_id}")
+    return container_id
+
+
+def publish_container(container_id):
+    url = f"{ROOT_URL}/media_publish"
+    payload = {"creation_id": container_id, "access_token": ACCESS_TOKEN}
+    response = requests.post(url, data=payload)
+    response.raise_for_status()
+    publish_response = response.json()
+    print(f"Publication réussie : {publish_response}")
+    return publish_response
+
+
+# Exécution du script
+
+# import sys
+# if len(sys.argv) < 2:
+#     print("Usage : python upload_transfer.py chemin/vers/fichier.mp4")
+#     sys.exit(1)
+
+# Twitch API credentials
 
 client_id = os.getenv("TWITCH_CLIENT_ID")
 client_secret = os.getenv("TWITCH_CLIENT_SECRET")
@@ -136,9 +221,9 @@ options.add_argument("--disable-dev-shm-usage")
 
 selenium_web_driver = webdriver.Chrome(options=options)
 
-ROOT_PATH = "C:/Users/Victor/Downloads/test/"
+ROOT_PATH = os.path.join(os.getcwd(), "test")
 VIDEO_FILE_EXTENSION = ".mp4"
-CLIPS_COUNT = 24
+CLIPS_COUNT = 1
 
 game_name = "Valorant"
 game_id = get_game_id(game_name)
@@ -153,6 +238,8 @@ clips = get_clips(
     CLIPS_COUNT,
 )
 
+files = []
+
 try:
     for i in range(len(clips)):
         print(f"Processing clip {i + 1}/{len(clips)}: {clips[i]['url']}")
@@ -165,6 +252,42 @@ try:
         edited_video_path = get_file_path(game_name, i, False)
         crop_video(original_video_path, edited_video_path)
         print(f"Cropped video saved to: {edited_video_path}")
+        files.append(edited_video_path)
 
 finally:
     selenium_web_driver.quit()
+
+try:
+    for filepath in files:
+        download_url = upload_file(filepath)
+        print(f"Successfully uploaded to: {download_url}")
+        container_id = create_container(download_url)
+except Exception as e:
+    print(f"Error : {e}")
+
+time.sleep(60)
+waited_time = 60
+publish_succeed = False
+
+while waited_time < 600:  # 10 minutes
+    try:
+        publish_response = publish_container(container_id)
+        publish_succeed = True
+        break
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 400:
+            print(
+                f"Error 400, waiting 1 minute before retrying... ({waited_time} seconds elapsed)"
+            )
+            print(e.response.json())
+            time.sleep(60)
+            waited_time += 60
+        else:
+            print(f"Unexpected error : {e}")
+            break
+
+if waited_time >= 600 and not publish_succeed:
+    print("Failed to publish after 10 minutes of waiting.")
+else:
+    print(f"Publication successful after {waited_time} seconds.")
+    print(f"Publication response : {publish_response}")
