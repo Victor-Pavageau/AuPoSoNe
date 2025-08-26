@@ -1,11 +1,13 @@
 """Main orchestrator for the AuPoSoNe application."""
 
+import os
+
 from .config.settings import settings
 from .services.dropbox_service import DropboxService
 from .services.instagram_service import InstagramService
 from .services.twitch_service import TwitchService
 from .services.video_service import VideoService
-from .utils.file_utils import get_file_path
+from .utils.file_utils import get_file_path, remove_files
 from .utils.web_scraper import WebScraper
 
 
@@ -59,6 +61,7 @@ class AuPoSoNeOrchestrator:
         for filepath in processed_files:
             try:
                 self._upload_and_publish(filepath)
+                self._remove_processed_files(filepath, game_name)
             except Exception as e:
                 print(f"Error uploading/publishing {filepath}: {e}")
                 raise e
@@ -93,3 +96,8 @@ class AuPoSoNeOrchestrator:
 
         # Publish with retry logic
         self.instagram_service.publish_with_retry(download_url)
+
+    def _remove_processed_files(self, filepath, game_name):
+        """Remove processed files from local and shared storages."""
+        remove_files(os.path.basename(filepath))
+        self.dropbox_service.delete_game_folder(game_name)
