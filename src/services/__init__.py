@@ -1,1 +1,1 @@
-"""Services module for external API integrations."""
+"""Services module for main application logic."""
