@@ -72,3 +72,18 @@ class DropboxService:
             raise Exception("Failed to get temporary link from Dropbox")
 
         return link
+
+    def delete_game_folder(self, game_name):
+        delete_url = "https://api.dropboxapi.com/2/files/delete_batch"
+
+        data = {"entries": [{"path": f"/clips/{game_name}"}]}
+
+        headers = {
+            "Authorization": f"Bearer {self.access_token}",
+            "Content-Type": "application/json",
+        }
+
+        response = requests.post(delete_url, headers=headers, data=json.dumps(data))
+        response.raise_for_status()
+
+        print("Successfully deleted all game files from Dropbox")
