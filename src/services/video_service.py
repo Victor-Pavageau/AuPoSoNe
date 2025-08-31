@@ -4,7 +4,7 @@ import subprocess
 
 import requests
 
-from ..utils.file_utils import ensure_directory_exists
+from utils.file_utils import ensure_directory_exists
 
 
 class VideoService:

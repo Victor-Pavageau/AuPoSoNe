@@ -5,7 +5,7 @@ import os
 
 import requests
 
-from ..config.settings import settings
+from config.settings import settings
 
 
 class DropboxService:

@@ -4,7 +4,7 @@ import sys
 # Add src to path so we can import our modules
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))
 
-from auposone.main import AuPoSoNeOrchestrator
+from main import AuPoSoNeOrchestrator
 
 
 def main():
