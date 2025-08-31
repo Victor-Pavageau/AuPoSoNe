@@ -1,15 +1,16 @@
 # AuPoSoNe
 
-![AuPoSoNe logo](./src/assets/logo.png)
-
 AuPoSoNe stands for **Au**tomated **Po**st on **So**cial **Ne**tworks. This project aims to automatically fetch, process, and post gaming content on social networks.
+
+![AuPoSoNe logo](./src/assets/logo.png)
 
 ## Table of Contents
 
 1. [About](#about)
 2. [Installation](#installation)
 3. [Usage](#usage)
-4. [Status](#status)
+4. [Project Structure](#project-structure)
+5. [Status](#status)
 
 ## About
 
@@ -41,6 +42,14 @@ cd AuPoSoNe
 
 3. **Install the required dependencies**:
 
+Make sure you have the following installed :
+
+- Python 3.8+
+- FFmpeg 7.1.1
+- Chrome browser (for Selenium)
+
+Then install the code dependencies by running the following command
+
 ```bash
 pip install -r requirements.txt
 ```
@@ -63,6 +72,20 @@ DROPBOX_ACCESS_TOKEN=your_dropbox_access_token
 python run.py
 ```
 
+## Project Structure
+
+```
+AuPoSoNe/
+├── run.py                  # Simple entry point
+├── requirements.txt        # Dependencies
+├── .env                    # API keys (not in git)
+├── src/                    # Organized code modules
+│   ├── main.py             # Main orchestrator
+│   ├── config/             # Settings management
+│   ├── services/           # Main application logic
+│   └── utils/              # Helper functions
+```
+
 ## Usage
 
 The system automatically processes gaming clips by:
@@ -76,8 +99,8 @@ You can customize the game and number of clips by modifying the configuration in
 
 ## Status
 
-**Development**: The development of this project is ongoing.
+**Development**: The development of this project started on July 2025 and is still ongoing.
 
 **Maintenance**: This project is actively maintained.
 
-**Future updates**: Regular updates are planned to improve functionality and add new features.
+**Future updates**: Versions v1 through v4 are included in the development roadmap and are planned for continuous deployment and delivery from July 2025 through February 2027. The current version is v1, with its final release planned for October 2025.
