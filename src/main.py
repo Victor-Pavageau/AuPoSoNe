@@ -2,13 +2,13 @@
 
 import os
 
-from .config.settings import settings
-from .services.dropbox_service import DropboxService
-from .services.instagram_service import InstagramService
-from .services.twitch_service import TwitchService
-from .services.video_service import VideoService
-from .utils.file_utils import get_file_path, remove_files
-from .utils.web_scraper import WebScraper
+from config.settings import settings
+from services.dropbox_service import DropboxService
+from services.instagram_service import InstagramService
+from services.twitch_service import TwitchService
+from services.video_service import VideoService
+from utils.file_utils import get_file_path, remove_files
+from utils.web_scraper import WebScraper
 
 
 class AuPoSoNeOrchestrator:

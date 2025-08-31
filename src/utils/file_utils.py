@@ -2,7 +2,7 @@
 
 import os
 
-from ..config.settings import settings
+from config.settings import settings
 
 
 def get_file_path(game_name, clip_index, is_original=True):
