@@ -8,8 +8,8 @@ AuPoSoNe stands for **Au**tomated **Po**st on **So**cial **Ne**tworks. This proj
 
 1. [About](#about)
 2. [Installation](#installation)
-3. [Usage](#usage)
-4. [Project Structure](#project-structure)
+3. [Project Structure](#project-structure)
+4. [Usage](#usage)
 5. [Status](#status)
 
 ## About
@@ -103,4 +103,4 @@ You can customize the game and number of clips by modifying the configuration in
 
 **Maintenance**: This project is actively maintained.
 
-**Future updates**: Versions v1 through v4 are included in the development roadmap and are planned for continuous deployment and delivery from July 2025 through February 2027. The current version is v1, with its final release planned for October 2025.
+**Future updates**: Versions v1 through v4 are included in the development roadmap and are planned for continuous deployment and delivery from July 2025 through February 2027. The current version is v2, with its final release planned for February 2026.
