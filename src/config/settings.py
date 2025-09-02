@@ -19,6 +19,11 @@ class Settings:
     INSTAGRAM_USER_ID = os.getenv("INSTAGRAM_USER_ID")
     INSTAGRAM_BASE_URL = "https://graph.facebook.com/v23.0"
 
+    # Facebook API Configuration
+    FACEBOOK_PAGE_ACCESS_TOKEN = os.getenv("FACEBOOK_PAGE_ACCESS_TOKEN")
+    FACEBOOK_PAGE_ID = os.getenv("FACEBOOK_PAGE_ID")
+    FACEBOOK_BASE_URL = "https://graph-video.facebook.com/v23.0"
+
     # Dropbox Configuration
     DROPBOX_ACCESS_TOKEN = os.getenv("DROPBOX_ACCESS_TOKEN")
 
@@ -39,6 +44,11 @@ class Settings:
     def instagram_root_url(self):
         """Get the Instagram API root URL."""
         return f"{self.INSTAGRAM_BASE_URL}/{self.INSTAGRAM_USER_ID}"
+
+    @property
+    def facebook_root_url(self):
+        """Get the Facebook API root URL."""
+        return f"{self.FACEBOOK_BASE_URL}/{self.FACEBOOK_PAGE_ID}"
 
     def validate(self):
         """Validate that all required environment variables are set."""

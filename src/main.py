@@ -4,6 +4,7 @@ import os
 
 from config.settings import settings
 from services.dropbox_service import DropboxService
+from services.facebook_service import FacebookService
 from services.instagram_service import InstagramService
 from services.twitch_service import TwitchService
 from services.video_service import VideoService
@@ -19,6 +20,7 @@ class AuPoSoNeOrchestrator:
         self.video_service = VideoService()
         self.dropbox_service = DropboxService()
         self.instagram_service = InstagramService()
+        self.facebook_service = FacebookService()
 
     def process_clips(self, game_name="Valorant", clips_count=None):
         """
@@ -96,6 +98,7 @@ class AuPoSoNeOrchestrator:
 
         # Publish with retry logic
         self.instagram_service.publish_with_retry(download_url)
+        self.facebook_service.publish_video(download_url)
 
     def _remove_processed_files(self, filepath, game_name):
         """Remove processed files from local and shared storages."""
