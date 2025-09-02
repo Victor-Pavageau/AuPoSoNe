@@ -5,5 +5,5 @@ A tool that automatically downloads Twitch clips, processes them for Instagram R
 and publishes them to Instagram.
 """
 
-__version__ = "1.1.0"
+__version__ = "2.0.0"
 __author__ = "Victor Pavageau"
