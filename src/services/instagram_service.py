@@ -20,10 +20,13 @@ class InstagramService:
         payload = {
             "video_url": video_url,
             "media_type": "REELS",
-            "access_token": self.access_token,
+        }
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.access_token}",
         }
 
-        response = requests.post(url, data=payload)
+        response = requests.post(url, json=payload, headers=headers)
         response.raise_for_status()
 
         container_id = response.json().get("id")
@@ -37,8 +40,12 @@ class InstagramService:
         """Publish a media container to Instagram."""
         url = f"{self.root_url}/media_publish"
         payload = {"creation_id": container_id, "access_token": self.access_token}
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.access_token}",
+        }
 
-        response = requests.post(url, data=payload)
+        response = requests.post(url, json=payload, headers=headers)
         response.raise_for_status()
 
         publish_response = response.json()
