@@ -1,6 +1,5 @@
 """Web scraping utilities using Selenium."""
 
-from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -28,31 +27,25 @@ class WebScraper:
     def get_video_source_url(self, clip_url):
         """Extract video source URL from a Twitch clip page."""
         try:
-            video_tag = self._get_video_markup(clip_url)
-            return self._get_src_attribute(video_tag)
+            return self._get_video_src(clip_url)
         except Exception as e:
             print(f"Error extracting video source from {clip_url}: {e}")
             return None
 
-    def _get_video_markup(self, video_url):
-        """Get video markup from the page source."""
+    def _get_video_src(self, video_url):
+        """Get video source URL from the page source."""
         self.driver.get(video_url)
         researched_tag = "video"
 
         # Wait for video element to be present
-        WebDriverWait(self.driver, 10).until(
+        video_element = WebDriverWait(self.driver, 60).until(
             EC.presence_of_element_located((By.TAG_NAME, researched_tag)),
         )
 
-        soup = BeautifulSoup(self.driver.page_source, "html.parser")
-        return soup.find(researched_tag)
+        if video_element and video_element.get_attribute("src"):
+            return video_element.get_attribute("src")
 
-    @staticmethod
-    def _get_src_attribute(video_tag):
-        """Extract src attribute from video tag."""
-        if video_tag and video_tag.has_attr("src"):
-            return video_tag["src"]
-        return None
+        raise Exception("Video element not found or missing 'src' attribute")
 
     def close(self):
         """Close the WebDriver."""
