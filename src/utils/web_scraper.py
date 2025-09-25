@@ -1,5 +1,7 @@
 """Web scraping utilities using Selenium."""
 
+import time
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -22,28 +24,49 @@ class WebScraper:
         for option in settings.CHROME_OPTIONS:
             options.add_argument(option)
 
+        # Add experimental options to avoid detection
+        options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        options.add_experimental_option("useAutomationExtension", False)
+
         self.driver = webdriver.Chrome(options=options)
+
+        # Execute script to remove webdriver property
+        self.driver.execute_script(
+            "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
+        )
+
+        # Set implicit wait
+        self.driver.implicitly_wait(10)
 
     def get_video_source_url(self, clip_url):
         """Extract video source URL from a Twitch clip page."""
         try:
             return self._get_video_src(clip_url)
-        except Exception as e:
-            print(f"Error extracting video source from {clip_url}: {e}")
+        except Exception:
             return None
 
     def _get_video_src(self, video_url):
         """Get video source URL from the page source."""
         self.driver.get(video_url)
-        researched_tag = "video"
 
-        # Wait for video element to be present
-        video_element = WebDriverWait(self.driver, 60).until(
-            EC.presence_of_element_located((By.TAG_NAME, researched_tag)),
+        # Wait for page to load completely
+        WebDriverWait(self.driver, 10).until(
+            lambda driver: driver.execute_script("return document.readyState")
+            == "complete"
         )
 
-        if video_element and video_element.get_attribute("src"):
-            return video_element.get_attribute("src")
+        # Scroll down to trigger any lazy loading
+        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
+        time.sleep(3)
+
+        video_element = WebDriverWait(self.driver, 30).until(
+            EC.presence_of_element_located((By.TAG_NAME, "video"))
+        )
+        video_src = video_element.get_attribute("src")
+
+        if video_src:
+            return video_src
 
         raise Exception("Video element not found or missing 'src' attribute")
 

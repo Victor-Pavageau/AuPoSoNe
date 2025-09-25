@@ -38,6 +38,15 @@ class Settings:
         "--disable-gpu",
         "--no-sandbox",
         "--disable-dev-shm-usage",
+        "--disable-blink-features=AutomationControlled",
+        "--disable-extensions",
+        "--disable-background-networking",
+        "--disable-default-apps",
+        "--disable-sync",
+        "--no-first-run",
+        "--no-default-browser-check",
+        "--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.6834.239 Safari/537.36",
+        "--log-level=WARNING",
     ]
 
     @property
